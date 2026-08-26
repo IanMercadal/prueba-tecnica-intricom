@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from '@nestjs/config';
 
 @Injectable() 
-export class AppConfigSerive {
+export class AppConfigService {
     constructor(private config: ConfigService) {}
 
     // Comprobamos tipo de dato establecido en la conf
