@@ -30,7 +30,13 @@ export class FileSystemRepository <T extends { id:number }> implements Repositor
     private async writeMetadata(metadata: Metadata): Promise<void> {
         await fs.writeFile(this.metadataPath, JSON.stringify(metadata, null, 2));
     }
-    
+
+    // funcion que lee la metadata actual
+    private async readMetadata(): Promise<Metadata> {
+        const rawData = await fs.readFile(this.metadataPath, 'utf-8');
+        return JSON.parse(rawData) as Metadata;
+    }
+
     // funcion para obtener datos desde data/Hotel/*
     async findAll(): Promise<T[]> {
         const files = await fs.readdir(this.folderPath);
@@ -42,5 +48,20 @@ export class FileSystemRepository <T extends { id:number }> implements Repositor
             })
         )
         return records.sort((a, b) => a.id - b.id);
+    }
+
+    // funcion para crear un registro en data/Hotel/{id}.json
+    async create(data: Omit<T, 'id' | 'createdDate'>): Promise<T> {
+        const metadata = await this.readMetadata();
+        const id = metadata.LAST_INDEX + 1;
+        const entity = { ...data, id, createdDate: new Date().toISOString() } as unknown as T;
+
+        await fs.writeFile(path.join(this.folderPath, `${id}.json`), JSON.stringify(entity, null, 2));
+
+        metadata.LAST_INDEX = id;
+        metadata.TOTAL_REGISTRIES += 1;
+        await this.writeMetadata(metadata);
+
+        return entity;
     }
 }
