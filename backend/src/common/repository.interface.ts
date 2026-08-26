@@ -1,5 +1,5 @@
 export interface Repository<T extends { id: number }> {
   findAll(): Promise<T[]>;
-  // create()
+  create(data: Omit<T, 'id' | 'createdDate'>): Promise<T>;
   // update()
 }

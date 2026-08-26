@@ -2,7 +2,7 @@ import { Pool, RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { Repository } from '../common/repository.interface';
 
 export class MysqlRepository<T extends { id: number }> implements Repository<T> {
-    constructor(private readonly pool: Pool, private readonly tableName: string) {}
+    constructor(private readonly pool: Pool, private readonly tableName: string) { }
 
     // funcion base para obtener datos desde bd
     async findAll(): Promise<T[]> {
@@ -21,5 +21,30 @@ export class MysqlRepository<T extends { id: number }> implements Repository<T> 
             }
         }
         return entity as T;
+    }
+
+    // funcioon base para crear
+    async create(data: Omit<T, 'id' | 'createdDate'>): Promise<T> {
+        const fields = Object.keys(data);
+        const dbFields = fields.map((f) => this.treatForDbColumn(f));
+        const placeholders = fields.map(() => '?').join(', ');
+        const values = Object.values(data);
+        const createdDate = new Date();
+
+        const [result] = await this.pool.query<ResultSetHeader>(
+            `INSERT INTO ${this.tableName} (${dbFields.join(', ')}, CreatedDate) VALUES (${placeholders}, ?)`,
+            [...values, createdDate],
+        );
+
+        return {
+            ...data,
+            id: result.insertId,
+            createdDate: createdDate.toISOString(),
+        } as unknown as T;
+    }
+
+    // funcion helper para que cuadren los nombres
+    private treatForDbColumn(field: string): string {
+        return field.charAt(0).toUpperCase() + field.slice(1);
     }
 }
