@@ -7,6 +7,10 @@ export interface FieldConfig<T> {
 export function EntityTable<T extends { id: number }>({
     items, fields, onEdit,
 }: { items: T[]; fields: FieldConfig<T>[]; onEdit: (item: T) => void }) {
+    if (items.length === 0) {
+        return <p>Sin resultados</p>;
+    }
+
     return (
         <table>
             <thead>
