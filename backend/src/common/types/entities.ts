@@ -4,3 +4,11 @@ export interface Hotel {
     address: string;
     createdDate: string;
 }
+
+export interface Client {
+    id: number;
+    name: string;
+    address: string;
+    phone: string;
+    createdDate: string;
+}
