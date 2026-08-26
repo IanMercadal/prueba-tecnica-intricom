@@ -31,7 +31,16 @@ export class FileSystemRepository <T extends { id:number }> implements Repositor
         await fs.writeFile(this.metadataPath, JSON.stringify(metadata, null, 2));
     }
     
+    // funcion para obtener datos desde data/Hotel/*
     async findAll(): Promise<T[]> {
-        return [];
+        const files = await fs.readdir(this.folderPath);
+        const recordFiles = files.filter((f) => f !== '_metadata.json');
+        const records = await Promise.all(
+            recordFiles.map(async(file) => {
+                const rawData = await fs.readFile(path.join(this.folderPath, file), 'utf-8');
+                return JSON.parse(rawData) as T;
+            })
+        )
+        return records.sort((a, b) => a.id - b.id);
     }
 }
