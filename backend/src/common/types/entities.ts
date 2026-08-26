@@ -12,3 +12,12 @@ export interface Client {
     phone: string;
     createdDate: string;
 }
+
+export interface HotelBooking {
+  id: number;
+  hotelId: number;
+  name: string;
+  address: string;
+  createdDate: string;
+  clientId: number;
+}
