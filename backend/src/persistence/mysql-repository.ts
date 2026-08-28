@@ -56,4 +56,27 @@ export class MysqlRepository<T extends { id: number }> implements Repository<T> 
         );
         return rows.length > 0;
     }
+
+    // funcion para actualizar un registro por id
+    async update(id: number, data: Partial<Omit<T, 'id' | 'createdDate'>>): Promise<T | null> {
+        const found = await this.exists(id);
+        if (!found) {
+            return null;
+        }
+
+        const fields = Object.keys(data);
+        if (fields.length > 0) {
+            const setClause = fields.map((f) => `${this.treatForDbColumn(f)} = ?`).join(', ');
+            await this.pool.query<ResultSetHeader>(
+                `UPDATE ${this.tableName} SET ${setClause} WHERE Id = ?`,
+                [...Object.values(data), id],
+            );
+        }
+
+        const [rows] = await this.pool.query<RowDataPacket[]>(
+            `SELECT * FROM ${this.tableName} WHERE Id = ?`,
+            [id],
+        );
+        return this.toEntity(rows[0]);
+    }
 }

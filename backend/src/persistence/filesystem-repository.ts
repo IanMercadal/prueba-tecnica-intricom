@@ -74,4 +74,20 @@ export class FileSystemRepository <T extends { id:number }> implements Repositor
             return false;
         }
     }
+
+    // funcion para actualizar un registro en data/Hotel/{id}.json
+    async update(id: number, data: Partial<Omit<T, 'id' | 'createdDate'>>): Promise<T | null> {
+        const filePath = path.join(this.folderPath, `${id}.json`);
+        let existing: T;
+        try {
+            const rawData = await fs.readFile(filePath, 'utf-8');
+            existing = JSON.parse(rawData) as T;
+        } catch {
+            return null;
+        }
+
+        const updated = { ...existing, ...data } as T;
+        await fs.writeFile(filePath, JSON.stringify(updated, null, 2));
+        return updated;
+    }
 }
