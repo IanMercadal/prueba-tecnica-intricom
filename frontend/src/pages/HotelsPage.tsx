@@ -1,6 +1,8 @@
 import { useEntity } from '../hooks/useEntity';
 import { EntityTable } from '../components/EntityTable';
+import { EntityForm } from '../components/EntityForm';
 import type { FieldConfig } from '../components/EntityTable';
+import { apiPost } from '../api';
 
 interface Hotel {
     id: number;
@@ -10,7 +12,7 @@ interface Hotel {
 }
 
 export function HotelsPage() {
-    const { items } = useEntity<Hotel>('/hotels');
+    const { items, refresh } = useEntity<Hotel>('/hotels');
 
     const fields: FieldConfig<Hotel>[] = [
         { key: 'name', label: 'Nombre' },
@@ -18,9 +20,20 @@ export function HotelsPage() {
         { key: 'createdDate', label: 'Fecha de creación' },
     ];
 
+    const createFields: FieldConfig<Hotel>[] = [
+        { key: 'name', label: 'Nombre' },
+        { key: 'address', label: 'Dirección' },
+    ];
+
+    const handleCreate = async (data: Partial<Hotel>) => {
+        await apiPost('/hotels', data);
+        refresh();
+    };
+
     return (
-        <div>
+        <div className="page">
             <h2>Hotels</h2>
+            <EntityForm fields={createFields} onSubmit={handleCreate} />
             <EntityTable items={items} fields={fields} onEdit={() => { }} />
         </div>
     );
