@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @Controller('bookings')
 export class BookingController {
@@ -11,4 +12,9 @@ export class BookingController {
 
   @Post()
   create(@Body() dto: CreateBookingDto) { return this.service.create(dto); }
+
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBookingDto) {
+    return this.service.update(id, dto);
+  }
 }
