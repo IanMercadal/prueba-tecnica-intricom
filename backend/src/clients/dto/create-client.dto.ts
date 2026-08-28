@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateClientDto {
     @IsString()
@@ -11,5 +11,6 @@ export class CreateClientDto {
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^\+?[0-9]+$/, { message: 'phone solo puede contener números y un "+" inicial' })
     phone: string;
 }
