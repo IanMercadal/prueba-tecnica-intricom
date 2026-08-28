@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useEntity } from '../hooks/useEntity';
 import { EntityTable } from '../components/EntityTable';
 import { EntityForm } from '../components/EntityForm';
 import type { FieldConfig } from '../components/EntityTable';
-import { apiPost } from '../api';
+import { apiPatch, apiPost } from '../api';
 
 interface HotelBooking {
     id: number;
@@ -15,6 +16,7 @@ interface HotelBooking {
 
 export function BookingsPage() {
     const { items, refresh } = useEntity<HotelBooking>('/bookings');
+    const [editingItem, setEditingItem] = useState<HotelBooking | null>(null);
 
     const fields: FieldConfig<HotelBooking>[] = [
         { key: 'hotelId', label: 'Hotel' },
@@ -24,7 +26,7 @@ export function BookingsPage() {
         { key: 'createdDate', label: 'Fecha de creación' },
     ];
 
-    const createFields: FieldConfig<HotelBooking>[] = [
+    const formFields: FieldConfig<HotelBooking>[] = [
         { key: 'hotelId', label: 'Hotel (id)', type: 'number' },
         { key: 'clientId', label: 'Cliente (id)', type: 'number' },
         { key: 'name', label: 'Nombre' },
@@ -36,11 +38,24 @@ export function BookingsPage() {
         refresh();
     };
 
+    const handleUpdate = async (data: Partial<HotelBooking>) => {
+        if (!editingItem) return;
+        await apiPatch(`/bookings/${editingItem.id}`, data);
+        setEditingItem(null);
+        refresh();
+    };
+
     return (
         <div className="page">
             <h2>Bookings</h2>
-            <EntityForm fields={createFields} onSubmit={handleCreate} />
-            <EntityTable items={items} fields={fields} onEdit={() => { }} />
+            <EntityForm
+                key={editingItem?.id ?? 'create'}
+                fields={formFields}
+                initialValues={editingItem ?? undefined}
+                onSubmit={editingItem ? handleUpdate : handleCreate}
+                onCancel={editingItem ? () => setEditingItem(null) : undefined}
+            />
+            <EntityTable items={items} fields={fields} onEdit={setEditingItem} />
         </div>
     );
 }

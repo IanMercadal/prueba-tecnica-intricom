@@ -16,7 +16,7 @@ export function EntityTable<T extends { id: number }>({
             <thead>
                 <tr>
                     {fields.map((f) => <th key={String(f.key)}>{f.label}</th>)}
-                    <th>Acciones (No disponible)</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>

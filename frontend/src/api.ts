@@ -22,3 +22,17 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
     }
     return res.json();
 }
+
+// Función base para las peticiones patch
+export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
+    const res = await fetch(`${BASE_URL}${path}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        throw new Error(payload?.message ?? `Error ${res.status}`);
+    }
+    return res.json();
+}
