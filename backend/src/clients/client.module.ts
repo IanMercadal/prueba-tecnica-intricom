@@ -9,5 +9,6 @@ import { ClientController } from './client.controller';
   imports: [ConfigModule],
   controllers: [ClientController],
   providers: [mysqlPoolProvider, clientRepositoryProvider, ClientService],
+  exports: [clientRepositoryProvider],
 })
 export class ClientModule {}

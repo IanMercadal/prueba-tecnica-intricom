@@ -64,4 +64,14 @@ export class FileSystemRepository <T extends { id:number }> implements Repositor
 
         return entity;
     }
+
+    // funcion para comprobar si existe un registro por id
+    async exists(id: number): Promise<boolean> {
+        try {
+            await fs.access(path.join(this.folderPath, `${id}.json`));
+            return true;
+        } catch {
+            return false;
+        }
+    }
 }

@@ -9,5 +9,6 @@ import { HotelController } from './hotel.controller';
   imports: [ConfigModule],
   controllers: [HotelController],
   providers: [mysqlPoolProvider, hotelRepositoryProvider, HotelService],
+  exports: [hotelRepositoryProvider],
 })
 export class HotelModule {}

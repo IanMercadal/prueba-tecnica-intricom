@@ -47,4 +47,13 @@ export class MysqlRepository<T extends { id: number }> implements Repository<T> 
     private treatForDbColumn(field: string): string {
         return field.charAt(0).toUpperCase() + field.slice(1);
     }
+
+    // funcion para comprobar si existe un registro por id
+    async exists(id: number): Promise<boolean> {
+        const [rows] = await this.pool.query<RowDataPacket[]>(
+            `SELECT 1 FROM ${this.tableName} WHERE Id = ? LIMIT 1`,
+            [id],
+        );
+        return rows.length > 0;
+    }
 }
